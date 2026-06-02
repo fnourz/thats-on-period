@@ -11,6 +11,7 @@
     <section class="calendar-panel" aria-label="Period calendar">
       <header class="app-header">
         <h1>Period.</h1>
+        <p class="helper-text" id="helperText">Tap a date to mark your period.</p>
       </header>
 
       <div class="calendar-header">
@@ -30,6 +31,11 @@
       </div>
 
       <div id="calendar" class="calendar-grid"></div>
+
+      <footer class="calendar-footer">
+        <p id="monthSummary" class="month-summary">0 days marked this month</p>
+        <button id="clearMonth" class="text-button" type="button">Clear month</button>
+      </footer>
     </section>
   </main>
 
