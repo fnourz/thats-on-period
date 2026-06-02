@@ -1,5 +1,8 @@
 const calendar = document.getElementById("calendar");
+const clearMonthButton = document.getElementById("clearMonth");
+const helperText = document.getElementById("helperText");
 const monthLabel = document.getElementById("monthLabel");
+const monthSummary = document.getElementById("monthSummary");
 const prevMonthButton = document.getElementById("prevMonth");
 const nextMonthButton = document.getElementById("nextMonth");
 
@@ -26,6 +29,10 @@ function dateKey(year, month, day) {
   return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
+function currentMonthPrefix() {
+  return `${visibleYear}-${String(visibleMonth + 1).padStart(2, "0")}-`;
+}
+
 function getSavedDates() {
   return JSON.parse(localStorage.getItem("periodDates") || "[]");
 }
@@ -42,6 +49,39 @@ function togglePeriodDate(key) {
 
   saveDates(nextDates);
   return nextDates.includes(key);
+}
+
+function clearCurrentMonth() {
+  const prefix = currentMonthPrefix();
+  const savedDates = getSavedDates();
+  saveDates(savedDates.filter((date) => !date.startsWith(prefix)));
+  renderCalendar();
+}
+
+function updateMonthDetails(savedDates) {
+  const markedThisMonth = savedDates.filter((date) => date.startsWith(currentMonthPrefix()));
+  const count = markedThisMonth.length;
+
+  monthSummary.textContent = `${count} ${count === 1 ? "day" : "days"} marked this month`;
+  clearMonthButton.disabled = count === 0;
+  helperText.textContent = count === 0
+    ? "Tap a date to mark your period."
+    : "Tap a marked date to remove it.";
+}
+
+function applyPeriodRunStyles(firstDay) {
+  const markedDays = [...calendar.querySelectorAll(".day.is-period")];
+
+  markedDays.forEach((dayButton) => {
+    const day = Number(dayButton.dataset.day);
+    const weekday = (firstDay + day - 1) % 7;
+    const hasPrevious = weekday !== 0 && calendar.querySelector(`[data-day="${day - 1}"].is-period`);
+    const hasNext = weekday !== 6 && calendar.querySelector(`[data-day="${day + 1}"].is-period`);
+
+    dayButton.classList.toggle("is-period-start", !hasPrevious && hasNext);
+    dayButton.classList.toggle("is-period-middle", Boolean(hasPrevious && hasNext));
+    dayButton.classList.toggle("is-period-end", Boolean(hasPrevious && !hasNext));
+  });
 }
 
 function renderCalendar() {
@@ -64,6 +104,7 @@ function renderCalendar() {
     dayButton.className = "day";
     dayButton.type = "button";
     dayButton.textContent = day;
+    dayButton.dataset.day = String(day);
     dayButton.setAttribute("aria-label", `Mark ${monthNames[visibleMonth]} ${day}, ${visibleYear}`);
 
     if (
@@ -82,13 +123,15 @@ function renderCalendar() {
     }
 
     dayButton.addEventListener("click", () => {
-      const isMarked = togglePeriodDate(key);
-      dayButton.classList.toggle("is-period", isMarked);
-      dayButton.setAttribute("aria-pressed", String(isMarked));
+      togglePeriodDate(key);
+      renderCalendar();
     });
 
     calendar.appendChild(dayButton);
   }
+
+  updateMonthDetails(savedDates);
+  applyPeriodRunStyles(firstDay);
 }
 
 prevMonthButton.addEventListener("click", () => {
@@ -112,5 +155,7 @@ nextMonthButton.addEventListener("click", () => {
 
   renderCalendar();
 });
+
+clearMonthButton.addEventListener("click", clearCurrentMonth);
 
 renderCalendar();
