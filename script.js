@@ -1,6 +1,9 @@
 const calendar = document.getElementById("calendar");
+const backupStatus = document.getElementById("backupStatus");
 const clearMonthButton = document.getElementById("clearMonth");
+const exportHistoryButton = document.getElementById("exportHistory");
 const helperText = document.getElementById("helperText");
+const importHistoryInput = document.getElementById("importHistory");
 const monthLabel = document.getElementById("monthLabel");
 const monthSummary = document.getElementById("monthSummary");
 const prevMonthButton = document.getElementById("prevMonth");
@@ -38,7 +41,8 @@ function getSavedDates() {
 }
 
 function saveDates(dates) {
-  localStorage.setItem("periodDates", JSON.stringify(dates));
+  const uniqueDates = [...new Set(dates)].sort();
+  localStorage.setItem("periodDates", JSON.stringify(uniqueDates));
 }
 
 function togglePeriodDate(key) {
@@ -55,7 +59,90 @@ function clearCurrentMonth() {
   const prefix = currentMonthPrefix();
   const savedDates = getSavedDates();
   saveDates(savedDates.filter((date) => !date.startsWith(prefix)));
+  setBackupStatus("Month cleared.");
   renderCalendar();
+}
+
+function setBackupStatus(message) {
+  backupStatus.textContent = message;
+}
+
+function getBackupFileName() {
+  const todayKey = dateKey(today.getFullYear(), today.getMonth(), today.getDate());
+  return `period-history-${todayKey}.json`;
+}
+
+function exportHistory() {
+  const savedDates = getSavedDates();
+  const backup = {
+    app: "Period.",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    dates: savedDates
+  };
+  const file = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+  const downloadLink = document.createElement("a");
+
+  downloadLink.href = URL.createObjectURL(file);
+  downloadLink.download = getBackupFileName();
+  downloadLink.click();
+  URL.revokeObjectURL(downloadLink.href);
+
+  setBackupStatus(savedDates.length === 0 ? "Exported an empty backup." : "History exported.");
+}
+
+function normalizeImportedDates(importedBackup) {
+  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+  const importedDates = Array.isArray(importedBackup)
+    ? importedBackup
+    : importedBackup.dates;
+
+  if (!Array.isArray(importedDates)) {
+    throw new Error("Backup file does not include dates.");
+  }
+
+  return importedDates.filter((date) => {
+    if (typeof date !== "string" || !datePattern.test(date)) {
+      return false;
+    }
+
+    const [year, month, day] = date.split("-").map(Number);
+    const parsedDate = new Date(year, month - 1, day);
+
+    return (
+      parsedDate.getFullYear() === year &&
+      parsedDate.getMonth() === month - 1 &&
+      parsedDate.getDate() === day
+    );
+  });
+}
+
+function importHistory(event) {
+  const [file] = event.target.files;
+
+  if (!file) {
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.addEventListener("load", () => {
+    try {
+      const importedBackup = JSON.parse(reader.result);
+      const importedDates = normalizeImportedDates(importedBackup);
+      const savedDates = getSavedDates();
+
+      saveDates([...savedDates, ...importedDates]);
+      setBackupStatus(`Imported ${importedDates.length} ${importedDates.length === 1 ? "date" : "dates"}.`);
+      renderCalendar();
+    } catch (error) {
+      setBackupStatus("Import failed. Choose a Period. backup file.");
+    } finally {
+      importHistoryInput.value = "";
+    }
+  });
+
+  reader.readAsText(file);
 }
 
 function updateMonthDetails(savedDates) {
@@ -157,5 +244,7 @@ nextMonthButton.addEventListener("click", () => {
 });
 
 clearMonthButton.addEventListener("click", clearCurrentMonth);
+exportHistoryButton.addEventListener("click", exportHistory);
+importHistoryInput.addEventListener("change", importHistory);
 
 renderCalendar();
