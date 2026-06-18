@@ -6,13 +6,13 @@ A simple, pink calendar web app for marking the days you are on your cycle. Tap 
 Your marked dates are saved locally in your own browser, so your history stays private to your device.
 
 Link to Live Website:
-https://significantlynour.github.io/thats-on-period/
+https://significantlynour.github.io/womens-health-app/
 
 ## Use It On Your Phone
 
 Once the site is live, open the GitHub Pages link on your phone:
 
-https://significantlynour.github.io/thats-on-period/
+https://significantlynour.github.io/womens-health-app/
 
 ### iPhone
 
