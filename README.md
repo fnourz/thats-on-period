@@ -1,5 +1,5 @@
-# thats-on-period
-Tracking menstrual cycles. Period.
+# tracking women's health
+Tracking menstrual cycles. A current work in progress, soon to come other women's health features.
 
 A simple, pink period calendar web app for marking the days you are on your period. Tap any date to add or remove a checkmark, view your monthly count, and clear a month when needed. 
 
