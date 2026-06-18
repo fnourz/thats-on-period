@@ -1,7 +1,7 @@
 # tracking women's health
 Tracking menstrual cycles. A current work in progress, soon to come other women's health features.
 
-A simple, pink period calendar web app for marking the days you are on your period. Tap any date to add or remove a checkmark, view your monthly count, and clear a month when needed. 
+A simple, pink calendar web app for marking the days you are on your cycle. Tap any date to add or remove a checkmark, view your monthly count, and clear a month when needed. 
 
 Your marked dates are saved locally in your own browser, so your history stays private to your device.
 
