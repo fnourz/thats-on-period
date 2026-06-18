@@ -146,7 +146,8 @@ h1 {
 
 .day:focus-visible,
 .icon-button:focus-visible,
-.text-button:focus-visible {
+.text-button:focus-visible,
+.file-button:focus-within {
   outline: 3px solid rgba(166, 15, 85, 0.35);
   outline-offset: 3px;
 }
@@ -210,6 +211,8 @@ h1 {
 }
 
 .text-button {
+  display: inline-grid;
+  place-items: center;
   border: 1px solid rgba(239, 47, 134, 0.28);
   border-radius: 999px;
   background: var(--pink-100);
@@ -227,9 +230,52 @@ h1 {
   transform: translateY(-1px);
 }
 
+.small-button {
+  min-height: 34px;
+  padding: 7px 11px;
+  font-size: 0.82rem;
+}
+
 .text-button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+.backup-panel {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(239, 47, 134, 0.18);
+}
+
+.backup-copy,
+.backup-status {
+  margin: 0;
+  color: var(--pink-700);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.backup-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px 0 0;
+}
+
+.file-input {
+  width: 1px;
+  height: 1px;
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.backup-status {
+  min-height: 1.3em;
+  margin-top: 10px;
 }
 
 .day.is-empty {
@@ -270,7 +316,16 @@ h1 {
     flex-direction: column;
   }
 
+  .backup-actions {
+    align-items: center;
+    flex-direction: row;
+  }
+
   .text-button {
     width: 100%;
+  }
+
+  .small-button {
+    width: auto;
   }
 }

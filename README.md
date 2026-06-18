@@ -31,3 +31,4 @@ https://significantlynour.github.io/womens-health-app/
 5. Tap **Add**.
 
 Your marked dates are saved in your phone’s browser storage, so they stay private to that device.
+Export and import your history as a private backup file, so your data stays with you.
